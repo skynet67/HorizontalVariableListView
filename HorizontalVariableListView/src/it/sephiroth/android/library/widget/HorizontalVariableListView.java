@@ -99,6 +99,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	private List<Integer> mChildWidths = new ArrayList<Integer>();
 	private List<Integer> mChildHeights = new ArrayList<Integer>();
 
+    private boolean mResetOnDataChanged = true;
 
 	private boolean mDataChanged = false;
 
@@ -254,7 +255,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 
 	@Override
 	protected void dispatchDraw( Canvas canvas ) {
-		super.dispatchDraw( canvas );
+		super.dispatchDraw(canvas);
 
 		if ( getChildCount() > 0 ) {
 			drawEdges( canvas );
@@ -402,7 +403,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 			}
 
 		} else {
-			Log.w( LOG_TAG, "This method has no effect on single selection list" );
+			Log.w(LOG_TAG, "This method has no effect on single selection list");
 		}
 	}
 
@@ -441,7 +442,11 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		public void onChanged() {
 			mAdapterItemCount = mAdapter.getCount();
 			Log.i( LOG_TAG, "onChange: " + mAdapterItemCount );
-			reset();
+            if(mResetOnDataChanged){
+                reset();
+            } else {
+                update();
+            }
 		};
 
 		@Override
@@ -460,7 +465,11 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 			}
 			Log.i( LOG_TAG, "onChanged(2): " + mAdapterItemCount );
 			invalidate();
-			reset();
+            if(mResetOnDataChanged){
+			    reset();
+            } else {
+                update();
+            }
 		}
 
 		@Override
@@ -562,10 +571,20 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		requestLayout();
 	}
 
+    /**
+     * Update.
+     */
+    private synchronized void update() {
+        initView();
+        removeAllViewsInLayout();
+        mForceLayout = true;
+        requestLayout();
+    }
+
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
-		Log.d( LOG_TAG, "onDetachedFromWindow" );
+		Log.d(LOG_TAG, "onDetachedFromWindow");
 
 		removeCallbacks( mScrollNotifier );
 		emptyRecycler();
@@ -586,7 +605,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	 */
 	@Override
 	protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
-		super.onMeasure( widthMeasureSpec, heightMeasureSpec );
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
 		mHeightMeasureSpec = heightMeasureSpec;
 		mWidthMeasureSpec = widthMeasureSpec;
@@ -998,7 +1017,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	
 	private void fireOnLayoutChangeListener( boolean changed, int left, int top, int right, int bottom ) {
 		if( mLayoutChangeListener != null ) {
-			mLayoutChangeListener.onLayoutChange( changed, left, top, right, bottom );
+			mLayoutChangeListener.onLayoutChange(changed, left, top, right, bottom);
 		}
 	}	
 
@@ -1010,7 +1029,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 
 	private void fireOnScrollFininshed() {
 		if ( null != mScrollFinishedListener ) {
-			mScrollFinishedListener.onScrollFinished( mCurrentX );
+			mScrollFinishedListener.onScrollFinished(mCurrentX);
 		}
 	}
 
@@ -1019,7 +1038,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 			if ( mScrollNotifier == null ) {
 				mScrollNotifier = new ScrollNotifier();
 			}
-			post( mScrollNotifier );
+			post(mScrollNotifier);
 		}
 	}
 	
@@ -1243,7 +1262,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	public boolean onTouchEvent( MotionEvent ev ) {
 
 		initVelocityTrackerIfNotExists();
-		mVelocityTracker.addMovement( ev );
+		mVelocityTracker.addMovement(ev);
 
 		final int action = ev.getAction();
 
@@ -1798,4 +1817,12 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	public int getGravity() {
 		return mAlignMode;
 	}
+
+    public boolean isResetOnDataChanged() {
+        return mResetOnDataChanged;
+    }
+
+    public void setResetOnDataChanged(boolean mResetOnDataChanged) {
+        this.mResetOnDataChanged = mResetOnDataChanged;
+    }
 }
