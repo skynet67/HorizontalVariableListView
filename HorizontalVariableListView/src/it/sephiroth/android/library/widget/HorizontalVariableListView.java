@@ -743,6 +743,9 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 			final boolean selected = getIsSelected( mLeftViewIndex );
 			int viewType = mAdapter.getItemViewType( mLeftViewIndex );
 			View child = mAdapter.getView( mLeftViewIndex, mRecycleBin.get( viewType ).poll(), this );
+            if(child == null){
+                break;
+            }
 			child.setSelected( selected );
 			addAndMeasureChild( child, 0 );
 
@@ -838,6 +841,9 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 			final boolean selected = getIsSelected( mRightViewIndex );
 			int viewType = mAdapter.getItemViewType( mRightViewIndex );
 			View child = mAdapter.getView( mRightViewIndex, mRecycleBin.get( viewType ).poll(), this );
+            if(child == null){
+                break;
+            }
 			child.setSelected( selected );
 			addAndMeasureChild( child, -1 );
 
