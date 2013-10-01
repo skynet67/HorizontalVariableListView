@@ -940,6 +940,8 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 
 	@Override
 	public boolean onScroll( MotionEvent e1, MotionEvent e2, float distanceX, float distanceY ) {
+        float delta =  distanceX - distanceY;
+        Log.i(LOG_TAG, "onScroll distanceX = " + distanceX + " distanceY " + distanceY + "delta " + delta);
 		return true;
 	}
 
@@ -1132,6 +1134,16 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 
 	@Override
 	public boolean onInterceptTouchEvent( MotionEvent ev ) {
+
+       if(checkIfScrollVertical(ev)){
+            getParent().requestDisallowInterceptTouchEvent( false );
+            return  false;
+        }
+
+       /* if(true){
+            getParent().requestDisallowInterceptTouchEvent( false );
+            return  false;
+        }*/
 
 		getParent().requestDisallowInterceptTouchEvent( true );
 
@@ -1411,7 +1423,47 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		return true;
 	}
 
-	private void onSecondaryPointerUp( MotionEvent ev ) {
+    private static Float verticalScrollCheckX;
+    private static Float verticalScrollCheckY;
+    private boolean checkIfScrollVertical(MotionEvent ev) {
+
+        boolean wasMotionVertical = false;
+
+        if(ev != null){
+            if(ev.getAction() == MotionEvent.ACTION_MOVE){
+
+                final int pointerCount = ev.getPointerCount();
+                Log.i(LOG_TAG, "pointerCount = " + pointerCount);
+                if(pointerCount == 1){
+                    if(verticalScrollCheckX != null && verticalScrollCheckY != null){
+                        float deltaX = Math.abs(ev.getX() - verticalScrollCheckX);
+                        float deltaY = Math.abs(ev.getY() - verticalScrollCheckY);
+                        float delta = deltaX - deltaY;
+
+                        Log.i(LOG_TAG, "deltaX = " + deltaX + "\n deltaY = "
+                                + deltaY + "\nDelta = " +delta);
+                        if(delta < 0){
+
+                            wasMotionVertical = true;
+                        }
+                    }
+                    verticalScrollCheckX = ev.getX();
+                    verticalScrollCheckY = ev.getY();
+
+                }
+
+
+
+            }else{
+                Log.i(LOG_TAG, "ev.getAction() != MotionEvent.ACTION_MOVE "+ ev.getAction());
+            }
+        }
+
+
+        return wasMotionVertical;
+    }
+
+    private void onSecondaryPointerUp( MotionEvent ev ) {
 		final int pointerIndex = ( ev.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK ) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 		final int pointerId = ev.getPointerId( pointerIndex );
 		if ( pointerId == mActivePointerId ) {
