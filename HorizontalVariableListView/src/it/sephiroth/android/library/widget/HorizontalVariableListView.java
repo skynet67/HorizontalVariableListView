@@ -910,7 +910,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		View child = getChildAt( 0 );
 
 		// remove to left...
-		while ( child != null && child.getRight() - positionX <= mLeftEdge ) {
+		while ( child != null && child.getRight() + positionX <= mLeftEdge ) {
 
 			if ( null != mAdapter ) {
 				int position = getPositionForView( child );
