@@ -235,9 +235,14 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 
 		scrollTo( newX, 0 );
 		mCurrentX = getScrollX();
-		removeNonVisibleItems( mCurrentX );
+        try {
+            removeNonVisibleItems( mCurrentX );
+        } catch (IndexOutOfBoundsException e) {
+            Log.e(LOG_TAG, e.getMessage());
+            e.printStackTrace();
+        }
 
-		fillList( mCurrentX );
+        fillList( mCurrentX );
 		invalidate();
 	}
 
@@ -705,9 +710,14 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		if ( child != null ) {
 			edge = child.getRight();
 		}
-		fillListRight( mCurrentX, edge );
+        try {
+            fillListRight( mCurrentX, edge );
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG, e.getMessage());
+        }
 
-		edge = 0;
+        edge = 0;
 		child = getChildAt( 0 );
 		if ( child != null ) {
 			edge = child.getLeft();
@@ -811,7 +821,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	 * @param rightEdge
 	 *            the right edge
 	 */
-	private void fillListRight( int positionX, int rightEdge ) {
+	private void fillListRight( int positionX, int rightEdge ) throws java.lang.IndexOutOfBoundsException{
 		boolean firstChild = getChildCount() == 0 || mDataChanged || mForceLayout;
 
 		if ( mAdapter == null ) return;
@@ -896,7 +906,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	 * @param positionX
 	 *            the position x
 	 */
-	private void removeNonVisibleItems( final int positionX ) {
+	private void removeNonVisibleItems( final int positionX ) throws java.lang.IndexOutOfBoundsException{
 		View child = getChildAt( 0 );
 
 		// remove to left...
@@ -1139,11 +1149,6 @@ public class HorizontalVariableListView extends HorizontalListView implements On
             getParent().requestDisallowInterceptTouchEvent( false );
             return  false;
         }
-
-       /* if(true){
-            getParent().requestDisallowInterceptTouchEvent( false );
-            return  false;
-        }*/
 
 		getParent().requestDisallowInterceptTouchEvent( true );
 
